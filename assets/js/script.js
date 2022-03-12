@@ -23,6 +23,13 @@ var hideContent = function (element) {
     element.className = "invisible";
 };
 
+var removeElement = function (selector) {
+    var element = document.querySelector(selector);
+    if(element){
+        element.remove();
+    }
+};
+
 var loadHighScores = function () {
     //Gets scores from localStorage.
     highScore = localStorage.getItem("highScore");
@@ -40,6 +47,8 @@ var resetScores = function () {
 
     //Delete local storage
     localStorage.removeItem("highScore");
+    removeElement("#highScores");
+    displayHighScore();
 };
 
 var loadQuestions = function () {
@@ -229,7 +238,9 @@ var answserHandler = function(clickedEl) {
 
 // Create HTML section to display high scores
 var displayHighScore = function () {
-    event.defaultPrevented;
+    // Remove previous section from view
+    removeElement("#roundScore");    
+    hideContent(startSectionEl);
     
     var highScoreSecEl = document.createElement("section");
     highScoreSecEl.setAttribute("id", "highScores");
@@ -267,8 +278,6 @@ var displayHighScore = function () {
     highScoreSecEl.appendChild(clearScoresBtnEl);
     quizMainEl.appendChild(highScoreSecEl);
 
-    //reover quiz over element
-    hideContent(startSectionEl);
     headerEl.setAttribute("class", "invisible");
 };
 
@@ -277,14 +286,15 @@ var saveHighScore = function() {
 };
 
 
-var scoreRecorder = function (submitBtn) {
-    //event.defaultPrevented;
+var scoreRecorder = function (event) {
+    event.preventDefault();
     console.log("scoreRecorder");
     //Check form input for iniitals
     var initials = document.querySelector("input[name='initials']").value;
     // check if input values are empty strings
     if (!initials || initials.length > 3) {
         alert("Enter your 2 or 3 charcter initials");
+        return;
     }
     // remove  or hide quizover 
     // call highsore display
@@ -305,6 +315,8 @@ var resetQuiz = function () {
         highScoreEl.remove();
     }
 
+    questionNumber = 0;
+    timerEl.textContent = "Time: 0";
     startSectionEl.className = "visible";
     headerEl.className = "visible";
 };
@@ -327,7 +339,6 @@ var buttonHandler = function () {
 };
 
 var startQuiz = function () {
-    //event.preventDefault();
     
     console.log("startQuiz entered");
     hideContent(startSectionEl);
