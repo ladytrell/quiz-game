@@ -7,22 +7,25 @@ var startBtnEl = document.querySelector("#startBTN");
 var headerEl = document.querySelector("header");
 var scoreBtnEl = document.querySelector("#scoreBTN");
 
-//var highScoreEl  = document.querySelector();
-//var timerEl = document.querySelector();
 var questions = [];
 var questionNumber = 0;
 var score = 0;
 var highScore = [];
 var timeIntervalID;
 
-// Will likely be local to functions passed as argument
-// var questionMainEl = document.querySelector();
-
+// Remove dom element from view and the consumed space
 var hideContent = function (element) {
 
     element.className = "invisible";
 };
 
+// Remove dom element from view but not the consumed space
+var hide  = function (element) {
+
+    element.className = "hidden";
+};
+
+//Remove the Dom element with the matching selector
 var removeElement = function (selector) {
     var element = document.querySelector(selector);
     if(element){
@@ -30,6 +33,7 @@ var removeElement = function (selector) {
     }
 };
 
+// Review previous scores from local storage
 var loadHighScores = function () {
     //Gets scores from localStorage.
     highScore = localStorage.getItem("highScore");
@@ -42,6 +46,7 @@ var loadHighScores = function () {
     }
 };
 
+// Remove saved scores
 var resetScores = function () {
     highScore = [];
 
@@ -51,50 +56,49 @@ var resetScores = function () {
     displayHighScore();
 };
 
+// Load quesiton array
 var loadQuestions = function () {
     questions = [
-        {   'questionText': "Question 1",
+        {   'questionText': "What method disable even default behavior?",
             'choices': [ 
-                {'answerText':"A",
+                {'answerText':"event.actionPrevent()",
                  'correct': false}, 
-                 {'answerText':"B", 
+                 {'answerText':"event.preventDefault()", 
                  'correct': true},
-                 {'answerText':"C",
+                 {'answerText':"event.defaultPrevent()",
                  'correct': false}, 
-                 {'answerText':"D",
-                 'correct': false}]
+                 {'answerText':"event.preventAction()",
+                 'correct': false}
+                ]
         },
-        /*{   'questionText': "Question 2",
+        {   'questionText': "Which function will be hoisted at application load?",
             'choices': [ 
-                {'answerText':"A",
+                {'answerText':"function myAction () {};",
                  'correct': true}, 
-                 {'answerText':"B", 
-                 'correct': false},
-                 {'answerText':"C",
-                 'correct': false}, 
-                 {'answerText':"D",
-                 'correct': false}]
+                 {'answerText':"var myAction = function () {};", 
+                 'correct': false}
+                ]
         },
-        {   'questionText': "Question 3",
+        /*{   'questionText': "UI is short hand for ",
             'choices': [ 
-                {'answerText':"A",
+                {'answerText':"User Intergration",
                  'correct': false}, 
-                 {'answerText':"B", 
+                 {'answerText':"User Intelligence", 
                  'correct': false},
-                 {'answerText':"C",
+                 {'answerText':"Utility Instrument",
                  'correct': false}, 
-                 {'answerText':"D",
+                 {'answerText':"User Interaction",
                  'correct': true}]
         },
-        {   'questionText': "Question 5",
+        {   'questionText': "CSS Specificity Hierarchy",
             'choices': [ 
-                {'answerText':"A",
+                {'answerText':"IDs, (Classes, pseudo-classes, attribute selectors), Inline styles, (Elements and pseudo-elements)",
                  'correct': false}, 
-                 {'answerText':"B", 
+                 {'answerText':"(Elements and pseudo-elements), Inline styles, (Classes, pseudo-classes, attribute selectors), IDs", 
                  'correct': false},
-                 {'answerText':"C",
+                 {'answerText':"Inline styles, IDs, (Classes, pseudo-classes, attribute selectors), (Elements and pseudo-elements)",
                  'correct': true}, 
-                 {'answerText':"D",
+                 {'answerText':"(Classes, pseudo-classes, attribute selectors), Inline styles, IDs, (Elements and pseudo-elements)",
                  'correct': false}]
         },
         {   'questionText': "Question 5",
@@ -111,6 +115,7 @@ var loadQuestions = function () {
     ];
 };
 
+//Start the quiz clock
 var startClock = function () {
     timerEl.textContent = "Time: " + score;
     timeIntervalID = setInterval(countdown, 1000);
@@ -118,17 +123,16 @@ var startClock = function () {
         timerEl.textContent = "Time: " + (score--);
         if(score <= -1){
             clearInterval(timeIntervalID);
+            endRound();
         }
     }
 };
 
-var displayQuestion = function (questionNum) {
 // Construct question for display
-
- //   console.log(JSON.stringify(questions));
+var displayQuestion = function (questionNum) {
     // create list item
     var questionEl = document.createElement("section");
-    questionEl.className = "question";
+    questionEl.setAttribute("id","question");
     // add id as a custom attribute
     questionEl.setAttribute("data-question-id", questionNum);
 
@@ -153,11 +157,14 @@ var displayQuestion = function (questionNum) {
     quizMainEl.appendChild(questionEl);  
 };
 
+// Show score for round and collect player initials
 var endRound = function () {
     //stop the clock
     clearInterval(timeIntervalID);
     score++;  //Add 1 back to the clock
 
+    removeElement("#question");
+   
     //Create Round Stats Section
     var quizOverEl = document.createElement("section"); 
     quizOverEl.setAttribute("id", "roundScore");
@@ -192,6 +199,7 @@ var endRound = function () {
     quizMainEl.appendChild(quizOverEl);    
 };
 
+// Show answer correctness
 var displayAnswerStatus = function (response, questionEl) {
     var responseEL = document.createElement("h2");
 
@@ -199,9 +207,10 @@ var displayAnswerStatus = function (response, questionEl) {
     questionEl.appendChild(responseEL);
 }
 
+// Determine answer correctness
 var checkAnswer = function (questionID, answerID) {
     //find the question element using the questiondID
-    var questionEl = document.querySelector(".question");
+    var questionEl = document.querySelector("#question");
     var response = questions[questionID].choices[answerID].correct;
     
     if(!response) {
@@ -214,6 +223,7 @@ var checkAnswer = function (questionID, answerID) {
     return response; 
 };
 
+// Process question answer
 var answserHandler = function(clickedEl) {
     var answerId = clickedEl.getAttribute("data-answer-id");
     var questionId = clickedEl.getAttribute("data-question-id");
@@ -232,7 +242,7 @@ var answserHandler = function(clickedEl) {
         // End round
         setTimeout(endRound, 2500);
     } else {
-        displayQuestion(questionNumber);
+        setTimeout(function (){displayQuestion(questionNumber);}, 2500);
     }    
 };
 
@@ -278,14 +288,15 @@ var displayHighScore = function () {
     highScoreSecEl.appendChild(clearScoresBtnEl);
     quizMainEl.appendChild(highScoreSecEl);
 
-    headerEl.setAttribute("class", "invisible");
+    hideContent(headerEl);
+    //headerEl.setAttribute("class", "hidden");
 };
 
 var saveHighScore = function() {
     localStorage.setItem("highScore", JSON.stringify(highScore));
 };
 
-
+// Recore score into array and local storage
 var scoreRecorder = function (event) {
     event.preventDefault();
     console.log("scoreRecorder");
@@ -296,8 +307,7 @@ var scoreRecorder = function (event) {
         alert("Enter your 2 or 3 charcter initials");
         return;
     }
-    // remove  or hide quizover 
-    // call highsore display
+    
     var scoreCard = { 
         'initials': initials.toUpperCase(),
         'score': score
@@ -305,10 +315,10 @@ var scoreRecorder = function (event) {
 
     highScore.push(scoreCard);
     saveHighScore();
-    //When called here highscores are not remaining on display long enough to be seen
-    displayHighScore();
+     displayHighScore();
 };
 
+// Quiz back to the default
 var resetQuiz = function () {
     var highScoreEl = document.querySelector("#highScores");
     if(highScoreEl){
@@ -321,6 +331,7 @@ var resetQuiz = function () {
     headerEl.className = "visible";
 };
 
+// Determine which element was clicked and take apropriate action
 var buttonHandler = function () {
     var clickedEl = event.target;
     
@@ -338,6 +349,7 @@ var buttonHandler = function () {
     console.log("buttonHander Exited");
 };
 
+// Start the quiz
 var startQuiz = function () {
     
     console.log("startQuiz entered");
