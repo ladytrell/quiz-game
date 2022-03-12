@@ -8,7 +8,6 @@
     border-style: none;
 }
 
-
 /*Utility Classes*/
 
 .invisible {
@@ -16,5 +15,57 @@
 }
 
 .visible {
-    display: block;
+    display: flex;
+}
+
+.hidden {
+    display: hidden;
+}
+
+header, main {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: white;   
+}
+
+header {
+    position: relative;
+}
+
+#timer {
+    position: absolute;
+    right: 1%;
+}
+
+section {
+    position: relative;
+    flex-wrap: wrap;
+}
+
+h1, p {
+    flex: 0 0 100%;
+    text-align: center;
+}
+
+#startBTN {
+    margin: 5px auto;
+}
+/* MEDIA QUERY FOR TABLETS AND SMALLER */
+@media screen and (min-width: 575px) {
+
+    header, main {
+        width: 80%; 
+        margin: 0 auto;
+    }
+    
+    
+}
+
+/* MEDIA QUERY FOR Meduim displays */
+@media screen and (min-width: 830px) {
+}
+
+/* MEDIA QUERY FOR Large displays */
+@media screen and (min-width: 980px) {
 }

@@ -229,6 +229,8 @@ var answserHandler = function(clickedEl) {
 
 // Create HTML section to display high scores
 var displayHighScore = function () {
+    event.defaultPrevented;
+    
     var highScoreSecEl = document.createElement("section");
     highScoreSecEl.setAttribute("id", "highScores");
 
@@ -265,6 +267,7 @@ var displayHighScore = function () {
     highScoreSecEl.appendChild(clearScoresBtnEl);
     quizMainEl.appendChild(highScoreSecEl);
 
+    //reover quiz over element
     hideContent(startSectionEl);
     headerEl.setAttribute("class", "invisible");
 };
@@ -275,6 +278,7 @@ var saveHighScore = function() {
 
 
 var scoreRecorder = function (submitBtn) {
+    //event.defaultPrevented;
     console.log("scoreRecorder");
     //Check form input for iniitals
     var initials = document.querySelector("input[name='initials']").value;
@@ -291,6 +295,7 @@ var scoreRecorder = function (submitBtn) {
 
     highScore.push(scoreCard);
     saveHighScore();
+    //When called here highscores are not remaining on display long enough to be seen
     displayHighScore();
 };
 
@@ -322,7 +327,7 @@ var buttonHandler = function () {
 };
 
 var startQuiz = function () {
-    event.preventDefault();
+    //event.preventDefault();
     
     console.log("startQuiz entered");
     hideContent(startSectionEl);
@@ -333,15 +338,14 @@ var startQuiz = function () {
     console.log("startQuiz exited");
 };
 
-resetQuiz();
+//resetQuiz();
 loadHighScores();
 //Testin calls
-
 /*
 */
 // Add Event Listeners can only occur elements that exist at page loade?
 startBtnEl.addEventListener("click", startQuiz);
 // Not loading properly with this event listener
-//scoreBtnEl.addEventListener("click", displayHighScore());
+scoreBtnEl.addEventListener("click", displayHighScore);
 quizMainEl.addEventListener("click", buttonHandler);
 quizMainEl.addEventListener("submit", scoreRecorder);
