@@ -10,7 +10,7 @@
 </head>
 <body>
     <header>
-        <a href="#">View high scores</a> <!--Likely also needs a span or button without color or border-->
+        <button id="scoreBTN" class="scoreBTN">View high scores</button> 
         <span id="timer">Timer:  0</span>
     </header>
     <main id="quizMain">
@@ -32,13 +32,21 @@
         </section>
         <section id="quizOver">
             <h1>All done!</h1>
-            <p id="finalScore">Your final score is 22.</p>
+            <p id="finalScore">Your final score is 8.</p>
             <form id="">
                 <label for="initials">Enter initials: </label>
-                <input type="text" id="initials" class="initials">
+                <input type="text" name="initials" class="initials">
                 <input type="submit" id="initialsSubmit" value="Submit">
             </form>
         </section>
+         <section id="highScores">
+            <h1>High Score</h1>
+            <ol id="scoreList">
+                <li>AK - 22</li>
+            </ol>
+            <button id="goBack">Go Back</button>
+            <button id="clearScores">Clear high scores</button>
+         </section>
          -->
     </main>
     <script src="./assets/js/script.js"></script>

@@ -3,6 +3,9 @@ var quizMainEl = document.querySelector("#quizMain");
 var startSectionEl = document.querySelector("#startSection");
 var startBtnEl = document.querySelector("#startBTN");
 var timerEl = document.querySelector("#timer");
+var startBtnEl = document.querySelector("#startBTN");
+var headerEl = document.querySelector("header");
+var scoreBtnEl = document.querySelector("#scoreBTN");
 
 //var highScoreEl  = document.querySelector();
 //var timerEl = document.querySelector();
@@ -18,6 +21,25 @@ var timeIntervalID;
 var hideContent = function (element) {
 
     element.className = "invisible";
+};
+
+var loadHighScores = function () {
+    //Gets scores from localStorage.
+    highScore = localStorage.getItem("highScore");
+  
+    if (highScore === null) {
+        highScore = [];
+    } else {  
+        //Converts highscore from the string format back into an array of objects.
+        highScore = JSON.parse(highScore);
+    }
+};
+
+var resetScores = function () {
+    highScore = [];
+
+    //Delete local storage
+    localStorage.removeItem("highScore");
 };
 
 var loadQuestions = function () {
@@ -147,7 +169,7 @@ var endRound = function () {
 
     var textInputEl = document.createElement("input");
     textInputEl.setAttribute("type", "text");
-    textInputEl.setAttribute("id", "initials");
+    textInputEl.setAttribute("name", "initials");
     textInputEl.setAttribute("class", "initials");
     formEl.appendChild(textInputEl);
 
@@ -199,41 +221,127 @@ var answserHandler = function(clickedEl) {
 
     if (score <= 0 || questionNumber == questions.length) {
         // End round
-        endRound();
+        setTimeout(endRound, 2500);
     } else {
         displayQuestion(questionNumber);
     }    
 };
 
+// Create HTML section to display high scores
+var displayHighScore = function () {
+    var highScoreSecEl = document.createElement("section");
+    highScoreSecEl.setAttribute("id", "highScores");
+
+    var highScoresTitle = document.createElement("h1");
+    highScoresTitle.textContent = "High Score";
+    highScoreSecEl.appendChild(highScoresTitle);
+
+    var scoreListEl = document.createElement("ol");
+    
+    // to set content for empty score list
+    if ( highScore === undefined || highScore.length == 0){
+        var scoreItemEl = document.createElement("li");
+        scoreItemEl.textContent = "No High Scores";
+        scoreListEl.appendChild(scoreItemEl);
+    } else {
+        // Add scores to the list 
+        for (var i = 0; i < highScore.length; i++) {
+            var scoreItemEl = document.createElement("li");
+            scoreItemEl.textContent = highScore[i].initials + " - " + highScore[i].score;
+            scoreListEl.appendChild(scoreItemEl);
+        }
+    }
+
+    highScoreSecEl.appendChild(scoreListEl);
+
+    var goBackBtnEl = document.createElement("button");
+    goBackBtnEl.setAttribute("id", "goBack");
+    goBackBtnEl.textContent = "Go Back";
+    var clearScoresBtnEl = document.createElement("button");
+    clearScoresBtnEl.setAttribute("id", "clearScores");
+    clearScoresBtnEl.textContent = "Clear high scores";
+
+    highScoreSecEl.appendChild(goBackBtnEl);
+    highScoreSecEl.appendChild(clearScoresBtnEl);
+    quizMainEl.appendChild(highScoreSecEl);
+
+    hideContent(startSectionEl);
+    headerEl.setAttribute("class", "invisible");
+};
+
+var saveHighScore = function() {
+    localStorage.setItem("highScore", JSON.stringify(highScore));
+};
+
+
+var scoreRecorder = function (submitBtn) {
+    console.log("scoreRecorder");
+    //Check form input for iniitals
+    var initials = document.querySelector("input[name='initials']").value;
+    // check if input values are empty strings
+    if (!initials || initials.length > 3) {
+        alert("Enter your 2 or 3 charcter initials");
+    }
+    // remove  or hide quizover 
+    // call highsore display
+    var scoreCard = { 
+        'initials': initials.toUpperCase(),
+        'score': score
+    };
+
+    highScore.push(scoreCard);
+    saveHighScore();
+    displayHighScore();
+};
+
+var resetQuiz = function () {
+    var highScoreEl = document.querySelector("#highScores");
+    if(highScoreEl){
+        highScoreEl.remove();
+    }
+
+    startSectionEl.className = "visible";
+    headerEl.className = "visible";
+};
+
 var buttonHandler = function () {
     var clickedEl = event.target;
-
+    
+    console.log(clickedEl);
     // answer selected
     if (clickedEl.matches(".answerOption")){
         answserHandler(clickedEl); 
     } 
-    else if (clickedEl.matches("#initialsSubmit")) {
-        console.log("clicked submit");
+    else if (clickedEl.matches("#goBack")) {
+        resetQuiz();
     }
+    else if (clickedEl.matches("#clearScores")) {
+        resetScores();
+    }
+    console.log("buttonHander Exited");
 };
 
 var startQuiz = function () {
     event.preventDefault();
     
+    console.log("startQuiz entered");
     hideContent(startSectionEl);
     loadQuestions();
     score = questions.length * 10;
     startClock(score);
     displayQuestion(questionNumber);
-    console.log("startQuiz");
+    console.log("startQuiz exited");
 };
 
-
+resetQuiz();
+loadHighScores();
 //Testin calls
 
-//*
+/*
+*/
 // Add Event Listeners can only occur elements that exist at page loade?
 startBtnEl.addEventListener("click", startQuiz);
+// Not loading properly with this event listener
+//scoreBtnEl.addEventListener("click", displayHighScore());
 quizMainEl.addEventListener("click", buttonHandler);
-//quizMainEl.addEventListener("click", answserHandler);
-//*/
+quizMainEl.addEventListener("submit", scoreRecorder);
