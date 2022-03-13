@@ -12,6 +12,7 @@ var questionNumber = 0;
 var score = 0;
 var highScore = [];
 var timeIntervalID;
+var timeout = 900;
 
 // Remove dom element from view and the consumed space
 var hideContent = function (element) {
@@ -79,7 +80,7 @@ var loadQuestions = function () {
                  'correct': false}
                 ]
         },
-        /*{   'questionText': "UI is short hand for ",
+        {   'questionText': "UI is short hand for ",
             'choices': [ 
                 {'answerText':"User Intergration",
                  'correct': false}, 
@@ -101,7 +102,7 @@ var loadQuestions = function () {
                  {'answerText':"(Classes, pseudo-classes, attribute selectors), Inline styles, IDs, (Elements and pseudo-elements)",
                  'correct': false}]
         },
-        {   'questionText': "Question 5",
+       /* {   'questionText': "Question 5",
             'choices': [ 
                 {'answerText':"A",
                  'correct': true}, 
@@ -120,11 +121,13 @@ var startClock = function () {
     timerEl.textContent = "Time: " + score;
     timeIntervalID = setInterval(countdown, 1000);
     function countdown () {
-        timerEl.textContent = "Time: " + (score--);
-        if(score <= -1){
+        if(score <= 0){
             clearInterval(timeIntervalID);
-            endRound();
+            timerEl.textContent = "Time: 0";
+
+            return;
         }
+        timerEl.textContent = "Time: " + (score--);
     }
 };
 
@@ -139,16 +142,17 @@ var displayQuestion = function (questionNum) {
     var questionTitle = document.createElement("h1");
     questionTitle.textContent = questions[questionNum].questionText;
 
-    var answerListEl = document.createElement("ol");
+    var answerListEl = document.createElement("ul");
 
     ///debugger;
     for(var i = 0; i < questions[questionNum].choices.length; i++) {
         var answerItemEl = document.createElement("li");
         answerItemEl.className = "answerOption";
+        //answerItemEl.className = "answerOption primarySelector";
         // add id as a custom attribute
         answerItemEl.setAttribute("data-answer-id", i);
         answerItemEl.setAttribute("data-question-id", questionNum);
-        answerItemEl.textContent = questions[questionNum].choices[i].answerText;
+        answerItemEl.textContent = (i + 1) + '.  ' + questions[questionNum].choices[i].answerText;
         answerListEl.appendChild(answerItemEl);
     }
 
@@ -159,9 +163,16 @@ var displayQuestion = function (questionNum) {
 
 // Show score for round and collect player initials
 var endRound = function () {
+    var element = document.querySelector("#roundScore");
+    if(element) {
+        return;
+    }
+
     //stop the clock
     clearInterval(timeIntervalID);
-    score++;  //Add 1 back to the clock
+    if (score < 0){
+        score =0;
+    }
 
     removeElement("#question");
    
@@ -190,6 +201,7 @@ var endRound = function () {
     formEl.appendChild(textInputEl);
 
     var submitFormEl = document.createElement("input");
+    submitFormEl.className = "primarySelector";
     submitFormEl.setAttribute("type", "submit");
     submitFormEl.setAttribute("id", "initialsSubmit");
     submitFormEl.setAttribute("value", "Submit");
@@ -200,11 +212,12 @@ var endRound = function () {
 };
 
 // Show answer correctness
-var displayAnswerStatus = function (response, questionEl) {
-    var responseEL = document.createElement("h2");
+var displayAnswerStatus = function (status, questionEl) {
+    var statusEL = document.createElement("h2");
+    statusEL.className = "status"
 
-    responseEL.textContent = response;
-    questionEl.appendChild(responseEL);
+    statusEL.textContent = status;
+    questionEl.appendChild(statusEL);
 }
 
 // Determine answer correctness
@@ -219,7 +232,7 @@ var checkAnswer = function (questionID, answerID) {
         displayAnswerStatus("Correct!", questionEl);
     }
     console.log("checkAnswer");
-    setTimeout(function(){questionEl.remove();}, 2500);  
+    setTimeout(function(){questionEl.remove();}, timeout);  
     return response; 
 };
 
@@ -240,9 +253,9 @@ var answserHandler = function(clickedEl) {
 
     if (score <= 0 || questionNumber == questions.length) {
         // End round
-        setTimeout(endRound, 2500);
+        setTimeout(endRound, timeout);
     } else {
-        setTimeout(function (){displayQuestion(questionNumber);}, 2500);
+        setTimeout(function (){displayQuestion(questionNumber);}, timeout);
     }    
 };
 
@@ -259,18 +272,20 @@ var displayHighScore = function () {
     highScoresTitle.textContent = "High Score";
     highScoreSecEl.appendChild(highScoresTitle);
 
-    var scoreListEl = document.createElement("ol");
+    var scoreListEl = document.createElement("ul");
     
     // to set content for empty score list
     if ( highScore === undefined || highScore.length == 0){
         var scoreItemEl = document.createElement("li");
+        scoreItemEl.className = "scoreItem";
         scoreItemEl.textContent = "No High Scores";
         scoreListEl.appendChild(scoreItemEl);
     } else {
         // Add scores to the list 
         for (var i = 0; i < highScore.length; i++) {
             var scoreItemEl = document.createElement("li");
-            scoreItemEl.textContent = highScore[i].initials + " - " + highScore[i].score;
+            scoreItemEl.className = "scoreItem";
+            scoreItemEl.textContent = (i + 1) + '.  ' + highScore[i].initials + " - " + highScore[i].score;
             scoreListEl.appendChild(scoreItemEl);
         }
     }
@@ -278,9 +293,11 @@ var displayHighScore = function () {
     highScoreSecEl.appendChild(scoreListEl);
 
     var goBackBtnEl = document.createElement("button");
+    goBackBtnEl.className = "primarySelector";
     goBackBtnEl.setAttribute("id", "goBack");
     goBackBtnEl.textContent = "Go Back";
     var clearScoresBtnEl = document.createElement("button");
+    clearScoresBtnEl.className = "primarySelector";
     clearScoresBtnEl.setAttribute("id", "clearScores");
     clearScoresBtnEl.textContent = "Clear high scores";
 
@@ -361,14 +378,12 @@ var startQuiz = function () {
     console.log("startQuiz exited");
 };
 
-//resetQuiz();
 loadHighScores();
-//Testin calls
-/*
-*/
-// Add Event Listeners can only occur elements that exist at page loade?
+
+// Add Event Listeners can only occur elements that exist at page loade
 startBtnEl.addEventListener("click", startQuiz);
-// Not loading properly with this event listener
 scoreBtnEl.addEventListener("click", displayHighScore);
 quizMainEl.addEventListener("click", buttonHandler);
 quizMainEl.addEventListener("submit", scoreRecorder);
+
+/**/
