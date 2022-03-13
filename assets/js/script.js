@@ -175,6 +175,7 @@ var endRound = function () {
     }
 
     removeElement("#question");
+    timerEl.textContent = "Time: " + score;
    
     //Create Round Stats Section
     var quizOverEl = document.createElement("section"); 
@@ -231,7 +232,7 @@ var checkAnswer = function (questionID, answerID) {
     } else {
         displayAnswerStatus("Correct!", questionEl);
     }
-    console.log("checkAnswer");
+    
     setTimeout(function(){questionEl.remove();}, timeout);  
     return response; 
 };
@@ -243,7 +244,6 @@ var answserHandler = function(clickedEl) {
 
     //Parent ID
     var response = checkAnswer(questionId, answerId);
-    console.log("answerHandler");
 
     if(!response) {
         score = score - 10;
@@ -316,7 +316,7 @@ var saveHighScore = function() {
 // Recore score into array and local storage
 var scoreRecorder = function (event) {
     event.preventDefault();
-    console.log("scoreRecorder");
+
     //Check form input for iniitals
     var initials = document.querySelector("input[name='initials']").value;
     // check if input values are empty strings
@@ -352,7 +352,6 @@ var resetQuiz = function () {
 var buttonHandler = function () {
     var clickedEl = event.target;
     
-    console.log(clickedEl);
     // answer selected
     if (clickedEl.matches(".answerOption")){
         answserHandler(clickedEl); 
@@ -363,19 +362,15 @@ var buttonHandler = function () {
     else if (clickedEl.matches("#clearScores")) {
         resetScores();
     }
-    console.log("buttonHander Exited");
 };
 
 // Start the quiz
 var startQuiz = function () {
-    
-    console.log("startQuiz entered");
     hideContent(startSectionEl);
     loadQuestions();
     score = questions.length * 10;
     startClock(score);
     displayQuestion(questionNumber);
-    console.log("startQuiz exited");
 };
 
 loadHighScores();
